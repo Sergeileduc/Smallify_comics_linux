@@ -29,14 +29,15 @@ subprocess.call(source)
 if MAX_DEPTH > 0:
     for root, dirs, files in os.walk(current, topdown=True):
         for name in dirs:
-            path = (os.path.join(root, name))
-            if root.count(os.sep) - current.count(os.sep) == MAX_DEPTH - 1:
-                del dirs[:]
-            try:
-                os.chdir(path)
-                print("Launching smallify-all in " + path)
-                subprocess.call(source)
-                os.chdir(previous_dir)
-            except Exception as e:
-                print(e)
-                pass
+            if name is not "Smaller_comics":
+                path = (os.path.join(root, name))
+                if root.count(os.sep) - current.count(os.sep) == MAX_DEPTH - 1:
+                    del dirs[:]
+                try:
+                    os.chdir(path)
+                    print("Launching smallify-all in " + path)
+                    subprocess.call(source)
+                    os.chdir(previous_dir)
+                except Exception as e:
+                    print(e)
+                    pass
