@@ -4,7 +4,7 @@ smallifiy uses Image Magick, please install first
 `sudo apt-get install imagemagick`
 
 
-, Put files into a known folder of your PATH (exemple : .local/bin)
+Put files into a known folder of your PATH (exemple : .local/bin)
 or make links (ln)
 
 Make sure they have execution (x) permission
