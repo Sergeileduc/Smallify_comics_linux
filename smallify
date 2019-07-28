@@ -51,15 +51,15 @@ function smallify-jpeg {
 
     # HEIGHT > MAX and SIZE > MAX ?
     if [[ $HEIGHT -gt $MAXHEIGHT && $SIZE -gt $MAXSIZE ]]; then
-        echo "magick size and quality !"
+        # echo "magick size and quality !"
 	    magick "$IMG" -quality $QUALITY -geometry x$MAXHEIGHT "$IMG"
     # HEIGHT > MAX but SIZE already ok ?
     elif [[ $HEIGHT -gt $MAXHEIGHT && $SIZE -le $MAXSIZE ]]; then
-        echo "magick size only"
+        # echo "magick size only"
         magick "$IMG" -geometry x$MAXHEIGHT "$IMG"
     # HEIGHT is ok (< MAX) but SIZE is too big ?
     elif [[ $SIZE -gt $MAXSIZE ]]; then
-        echo "magick quality only"
+        # echo "magick quality only"
         magick "$IMG" -quality $QUALITY "$IMG"
     else
         echo "Nothing to do, jpeg already small"
@@ -91,6 +91,35 @@ function archive-comic {
     fi
 }
 
+function check-comic {
+    pushd "Smaller_comics" 1>/dev/null || return
+    # if [[ $FILE == *.cbz ]]; then
+    if [[ $(file --mime-type -b "$FILE") == application/zip ]]; then
+        if unzip -tq $FILE; then
+            echo "$FILE is OK"
+             # 0 = true
+             return 0
+        else
+            # 1 = false
+            return 1
+        fi
+    elif [[ $(file --mime-type -b "$FILE") == application/x-rar ]]; then
+        if unrar -t $FILE; then
+            echo "$FILE is OK"
+             # 0 = true
+             return 0
+        else
+            # 1 = false
+            return 1
+        fi
+    else
+        echo "$FILE is not RAR or ZIP"
+        exit 1
+    fi
+    popd 1>/dev/null || return
+    # echo "COUCOU"
+}
+
 unarchive-comic
 
 # Smallify jpeg with Image Magick voodoo
@@ -115,3 +144,6 @@ mkdir -p Smaller_comics
 
 # make new archive
 archive-comic
+
+# Check integrity
+if check-comic; then echo "YAY"; fi
