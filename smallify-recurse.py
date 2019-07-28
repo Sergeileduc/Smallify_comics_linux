@@ -31,13 +31,14 @@ if MAX_DEPTH > 0:
         for name in dirs:
             if name != "Smaller_comics":
                 path = (os.path.join(root, name))
-                if root.count(os.sep) - current.count(os.sep) == MAX_DEPTH - 1:
-                    del dirs[:]
-                try:
-                    os.chdir(path)
-                    print("Launching smallify-all in " + path)
-                    subprocess.call(source)
-                    os.chdir(previous_dir)
-                except Exception as e:
-                    print(e)
+                if path.count(os.sep) - current.count(os.sep) > MAX_DEPTH:
                     pass
+                else:
+                    try:
+                        os.chdir(path)
+                        print("Launching smallify-all in " + path)
+                        subprocess.call(source)
+                        os.chdir(previous_dir)
+                    except Exception as e:
+                        print(e)
+                        pass
