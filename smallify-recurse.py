@@ -29,7 +29,7 @@ subprocess.call(source)
 if MAX_DEPTH > 0:
     for root, dirs, files in os.walk(current, topdown=True):
         for name in dirs:
-            if name is not "Smaller_comics":
+            if name != "Smaller_comics":
                 path = (os.path.join(root, name))
                 if root.count(os.sep) - current.count(os.sep) == MAX_DEPTH - 1:
                     del dirs[:]
