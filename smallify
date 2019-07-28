@@ -108,7 +108,7 @@ function check-comic {
             return 1
         fi
     elif [[ $(file --mime-type -b "$FILE") == application/x-rar ]]; then
-        if unrar t $FILE; then
+        if unrar t "$FILE"; then
             echo "$FILE is OK"
              # 0 = true
              popd 1>/dev/null || return
@@ -128,7 +128,7 @@ function check-comic {
 
 function move-comic {
     echo "moving $FILE"
-    mv -f Smaller_comics/$FILE .
+    mv -f Smaller_comics/"$FILE" .
 }
 
 unarchive-comic
