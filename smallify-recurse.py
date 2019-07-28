@@ -31,7 +31,8 @@ if MAX_DEPTH > 0:
         for name in dirs:
             if name != "Smaller_comics":
                 path = (os.path.join(root, name))
-                if path.count(os.sep) - current.count(os.sep) > MAX_DEPTH:
+                deg_of_sep = path.count(os.sep) - current.count(os.sep)
+                if deg_of_sep > MAX_DEPTH:
                     pass
                 else:
                     try:
