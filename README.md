@@ -4,8 +4,8 @@ smallifiy uses Image Magick, please install first
 `sudo apt-get install imagemagick`
 
 
-Put files into a known folder of your PATH (exemple : .local/bin)
-or make links (ln)
+Put files into a known folder of your PATH (exemple : `.local/bin`)
+or make links (ln) between your git clone folder files, and your path `.local/bin`
 
 Make sure they have execution (x) permission
 
