@@ -16,3 +16,14 @@ In a folder containing multiple cbr and/or cbz files,
 open a Terminal and type :
 
 `smallify-all`
+
+For recursive, you can use :
+
+`smallify-recurse.py`
+(all sub-folders)
+
+`smallify-recurse.py -d 2`
+(2 sub-level depth)
+
+for current folder only
+`smallify-recurse.py -d 0`
