@@ -3,6 +3,8 @@
 for FILE in *{.cbr,.CBR,.cbz,.CBZ}
 do
 	[ -e "$FILE" ] || continue
+    # second argument is jpeg quality
+    # third argument is the new height of pictures
 	smallify "$FILE" 70 1920
 	echo "------------------------"
 done

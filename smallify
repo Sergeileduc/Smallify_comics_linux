@@ -26,6 +26,7 @@ function unarchive-comic {
         zip -d "$FILE" "*desktop.ini" &>/dev/null
         DIR="${FILE%.*}"
         mkdir "$DIR"
+        echo "Extraction de $FILE"
         unzip -q "$FILE" -d "$DIR"
     else
         echo "$FILE is not RAR or ZIP"
