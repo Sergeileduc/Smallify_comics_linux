@@ -44,7 +44,6 @@ if args.replace is not None:
 if args.folder is not None:
     custom_folder = args.folder
     command.extend(['-f', custom_folder])
-    print(f'-f "{custom_folder}"')
 
 print("Launching smallify-all in current folder")
 subprocess.call(command)

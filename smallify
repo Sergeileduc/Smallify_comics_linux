@@ -99,7 +99,7 @@ function smallify-jpeg {
     SIZE=$(du -k "$IMG" | cut -f1)
     PORTRAIT=true
     if (( $HEIGHT > $WIDTH )); then PORTRAIT=true; else PORTRAIT=false; fi
-    echo "Dimensions : $WIDTH x $HEIGHT. Poids = $SIZE ko" Portrait ? $PORTRAIT
+    # echo "Dimensions : $WIDTH x $HEIGHT. Poids = $SIZE ko" Portrait ? $PORTRAIT
     if $PORTRAIT ; then
         # echo portrait
         MAXSIZE=$PORTRAITSIZE
@@ -121,7 +121,8 @@ function smallify-jpeg {
         # echo "magick quality only"
         magick "$IMG" -quality $QUALITY "$IMG"
     else
-        echo "Nothing to do, jpeg already small"
+        # echo "Nothing to do, jpeg already small"
+        :
     fi
 }
 
@@ -166,7 +167,7 @@ function check-comic {
             return 1
         fi
     elif [[ $(file --mime-type -b "$FILE") == application/x-rar ]]; then
-        if unrar t "$FILE"; then
+        if unrar t "$FILE" -idq; then
             echo "$FILE is OK"
              # 0 = true
              popd 1>/dev/null || return
