@@ -189,14 +189,6 @@ function move-comic {
     mv -f "$FOLDER/$FILE" .
 }
 
-# if [[ $REPLACE -eq 0 ]]; then
-#     echo "REPLACE"
-# else
-#     echo "NON REPLACE"
-# fi
-
-echo "$FOLDER"
-
 unarchive-comic
 
 # Smallify jpeg with Image Magick voodoo

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-params="$@"
+REPLACE=1 # 1 is False
 
 usage="$(cat <<-EOF
 Example :
@@ -58,10 +58,22 @@ done
 
 for FILE in *{.cbr,.CBR,.cbz,.CBZ}
 do
-    echo "smallify $FILE 70 1920 $params"
-	[ -e "$FILE" ] || continue
+    # echo "smallify $FILE 70 1920 $params"
     # second argument is jpeg quality
     # third argument is the new height of pictures
-	smallify "$FILE" 70 1920 "$@"
+	[ -e "$FILE" ] || continue
+    # Stupid mode, because folder is finally deleted in replace mode
+    if [[ $REPLACE -eq 0 && ! -z "$FOLDER" ]]; then
+        smallify "$FILE" 70 1920 -r -f "$FOLDER"
+    # Replace mode, -r option
+    elif [[ $REPLACE -eq 0 ]]; then
+        smallify "$FILE" 70 1920 -r
+    # No Replace mode, with custom folder
+    elif [ ! -z "$FOLDER" ]; then
+        smallify "$FILE" 70 1920 -f "$FOLDER"
+    # Default mode, no replace
+    else
+        smallify "$FILE" 70 1920
+    fi
 	echo "------------------------"
 done
