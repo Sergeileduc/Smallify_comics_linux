@@ -1,10 +1,67 @@
 #!/bin/bash
 
+params="$@"
+
+usage="$(cat <<-EOF
+Example :
+$(basename "$0")
+
+By default, it saves smallified comics in 'Smaller_comics' default folder.
+
+$(basename "$0") -r or $(basename "$0") --replace
+will REPLACE your comics ! Be careful !!
+
+$(basename "$0") -f \"my smaller comics\"
+will save your smallified comics in \"my smaller comics\"
+
+$(basename "$0") [-h] [-r] [-f folder]
+where:
+    -h              show this help text
+    -r, --replace   set the 'Replace' flag on ! It replace your comics !
+                    Be very careful with this
+    -f, --folder    set the folder where to save smallified comics
+EOF
+)"
+
+while :; do
+    case $1 in
+        -h|-\?|--help)
+            #show_help    # Display a usage synopsis.
+            echo "$usage"
+            exit
+            ;;
+	    -r|--replace)       # Takes an option argument; ensure it has been specified.
+            REPLACE=0
+            ;;
+        -f|--folder)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                FOLDER="$2"
+                # echo "Destination folder : '$FOLDER'"
+                shift
+            else
+                die 'ERROR: "--file" requires a non-empty option argument.'
+            fi
+            ;;
+        --)              # End of all options.
+            shift
+            break
+            ;;
+        -?*)
+            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            ;;
+        *)               # Default case: No more options, so break out of the loop.
+            break
+    esac
+
+    shift
+done
+
 for FILE in *{.cbr,.CBR,.cbz,.CBZ}
 do
+    echo "smallify $FILE 70 1920 $params"
 	[ -e "$FILE" ] || continue
     # second argument is jpeg quality
     # third argument is the new height of pictures
-	smallify "$FILE" 70 1920
+	smallify "$FILE" 70 1920 "$@"
 	echo "------------------------"
 done

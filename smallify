@@ -10,20 +10,41 @@ FOLDER="Smaller_comics"
 PORTRAITSIZE=1000  # in ko
 PAYSAGESIZE=2000  # in ko
 
+usage="$(cat <<-EOF
+$(basename "$0") file quality height [-h] [-r] [-f folder]
+Example :
+$(basename "$0") myfile.cbz 70 1920
+
+By default, it saves smallified comics in 'Smaller_comics' default folder.
+
+$(basename "$0") myfile.cbz 70 1920 -r
+will REPLACE your comics ! Be careful !!
+
+$(basename "$0") myfile.cbz 70 1920 -f \"my smaller comics\"
+will save your smallified comics in \"my smaller comics\"
+
+where:
+    -h              show this help text
+    -r, --replace   set the 'Replace' flag on ! It replace your comics !
+                    Be very careful with this
+    -f, --folder    set the folder where to save smallified comics
+EOF
+)"
+
 shift 3
 while :; do
     case $1 in
         -h|-\?|--help)
             #show_help    # Display a usage synopsis.
-            echo "HELP"
+            echo "$usage"
             exit
             ;;
 	    -r|--replace)       # Takes an option argument; ensure it has been specified.
             REPLACE=0
             ;;
-        -d|--directory)       # Takes an option argument; ensure it has been specified.
+        -f|--folder)       # Takes an option argument; ensure it has been specified.
             if [ "$2" ]; then
-                FOLDER=$2
+                FOLDER="$2"
                 echo "Destination folder : '$FOLDER'"
                 shift
             else
@@ -50,9 +71,9 @@ function unarchive-comic {
     if [[ $(file --mime-type -b "$FILE") == application/x-rar ]]; then
         echo "$FILE is rared"
         DIR="${FILE%.*}"
-        mkdir "$DIR"
+        mkdir -p "$WORKING/$DIR"
         echo "Extraction de $FILE"
-        unrar x ./"$FILE" -o "$DIR" -idq
+        unrar x ./"$FILE" -o "$WORKING/$DIR" -idq
 
     # Test if archive is ZIP
     elif [[ $(file --mime-type -b "$FILE") == application/zip ]]; then
@@ -62,9 +83,9 @@ function unarchive-comic {
         zip -d "$FILE" "*.DS_Store" &>/dev/null
         zip -d "$FILE" "*desktop.ini" &>/dev/null
         DIR="${FILE%.*}"
-        mkdir "$DIR"
+        mkdir -p "$WORKING/$DIR"
         echo "Extraction de $FILE"
-        unzip -q "$FILE" -d "$DIR"
+        unzip -q "$FILE" -d "$WORKING/$DIR"
     else
         echo "$FILE is not RAR or ZIP"
         exit 1
@@ -116,14 +137,14 @@ function smallify-png {
 function archive-comic {
     if [[ $FILE == *.cbz ]]; then
         echo "Création archive $FILE"
-        pushd "$DIR" 1>/dev/null || return
-        zip -q -r "../$FOLDER/$FILE" *
+        pushd "$WORKING/$DIR" 1>/dev/null || return
+        zip -q -r "../../$FOLDER/$FILE" *
         popd 1>/dev/null || return
-        rm -r "$DIR"
+        rm -r "$WORKING/$DIR"
     elif [[ $FILE == *.cbr ]]; then
         echo "Création archive $FILE"
-        rar a -ma4 -r -ep1 "$FOLDER/$FILE" "$DIR/" -idq
-        rm -r "$DIR"
+        rar a -ma4 -r -ep1 "$FOLDER/$FILE" "$WORKING/$DIR/" -idq
+        rm -r "$WORKING/$DIR"
     else
         echo "Fichier non pris en charge"
     fi
@@ -168,17 +189,19 @@ function move-comic {
     mv -f "$FOLDER/$FILE" .
 }
 
-if [[ $REPLACE -eq 0 ]]; then
-    echo "REPLACE"
-else
-    echo "NON REPLACE"
-fi
+# if [[ $REPLACE -eq 0 ]]; then
+#     echo "REPLACE"
+# else
+#     echo "NON REPLACE"
+# fi
+
+echo "$FOLDER"
 
 unarchive-comic
 
 # Smallify jpeg with Image Magick voodoo
 echo "Réduction des images"
-pushd "$DIR" 1>/dev/null || return
+pushd "$WORKING/$DIR" 1>/dev/null || return
 
 # smallify all jpg
 find . -type f -iname "*.jpg" -print0 | \
@@ -199,7 +222,15 @@ mkdir -p "$FOLDER"
 # make new archive
 archive-comic
 
-# Check integrity and move
-if check-comic; then move-comic; fi
+if [[ $REPLACE -eq 0 ]]; then
+    echo "Remplacement des fichiers !!!!"
+    # Check integrity and move
+    if check-comic; then move-comic; fi
+    rmdir "$FOLDER"
+else
+    if check-comic; then echo "Fichiers non remplacés, situés dans '$FOLDER'"; fi
+fi
 
-rmdir "$FOLDER"
+
+# rmdir "$FOLDER"
+rmdir $WORKING
