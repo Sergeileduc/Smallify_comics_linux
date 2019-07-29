@@ -4,8 +4,45 @@ FILE="$1"
 QUALITY="$2"
 MAXHEIGHT=$3
 
+REPLACE=1 # 1 is False
+WORKING="Working"
+FOLDER="Smaller_comics"
 PORTRAITSIZE=1000  # in ko
 PAYSAGESIZE=2000  # in ko
+
+shift 3
+while :; do
+    case $1 in
+        -h|-\?|--help)
+            #show_help    # Display a usage synopsis.
+            echo "HELP"
+            exit
+            ;;
+	    -r|--replace)       # Takes an option argument; ensure it has been specified.
+            REPLACE=0
+            ;;
+        -d|--directory)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                FOLDER=$2
+                echo "Destination folder : '$FOLDER'"
+                shift
+            else
+                die 'ERROR: "--file" requires a non-empty option argument.'
+            fi
+            ;;
+        --)              # End of all options.
+            shift
+            break
+            ;;
+        -?*)
+            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            ;;
+        *)               # Default case: No more options, so break out of the loop.
+            break
+    esac
+
+    shift
+done
 
 function unarchive-comic {
     # If / Elif : unarchive file (rar or zip)
@@ -80,12 +117,12 @@ function archive-comic {
     if [[ $FILE == *.cbz ]]; then
         echo "Création archive $FILE"
         pushd "$DIR" 1>/dev/null || return
-        zip -q -r "../Smaller_comics/$FILE" *
+        zip -q -r "../$FOLDER/$FILE" *
         popd 1>/dev/null || return
         rm -r "$DIR"
     elif [[ $FILE == *.cbr ]]; then
         echo "Création archive $FILE"
-        rar a -ma4 -r -ep1 "Smaller_comics/$FILE" "$DIR/" -idq
+        rar a -ma4 -r -ep1 "$FOLDER/$FILE" "$DIR/" -idq
         rm -r "$DIR"
     else
         echo "Fichier non pris en charge"
@@ -93,7 +130,7 @@ function archive-comic {
 }
 
 function check-comic {
-    pushd "Smaller_comics" 1>/dev/null || return
+    pushd "$FOLDER" 1>/dev/null || return
     # if [[ $FILE == *.cbz ]]; then
     if [[ $(file --mime-type -b "$FILE") == application/zip ]]; then
         if unzip -tq "$FILE"; then
@@ -128,8 +165,14 @@ function check-comic {
 
 function move-comic {
     echo "moving $FILE"
-    mv -f Smaller_comics/"$FILE" .
+    mv -f "$FOLDER/$FILE" .
 }
+
+if [[ $REPLACE -eq 0 ]]; then
+    echo "REPLACE"
+else
+    echo "NON REPLACE"
+fi
 
 unarchive-comic
 
@@ -151,7 +194,7 @@ find . -type f -iname "*.png" -print0 | \
 
 popd 1>/dev/null || return
 
-mkdir -p "Smaller_comics"
+mkdir -p "$FOLDER"
 
 # make new archive
 archive-comic
@@ -159,4 +202,4 @@ archive-comic
 # Check integrity and move
 if check-comic; then move-comic; fi
 
-rmdir Smaller_comics
+rmdir "$FOLDER"
