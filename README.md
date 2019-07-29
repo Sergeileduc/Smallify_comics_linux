@@ -29,3 +29,6 @@ For recursive, you can use :
 
 for current folder only
 `smallify-recurse.py -d 0`
+
+## License
+[GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0)
